@@ -1,0 +1,138 @@
+# Default configuration. Edit values here directly; override files (smoke.yaml, pilot.yaml)
+# and "a.b=c" overrides are merged on top of this file.
+
+# Run environment: dataset, device, threads, output locations.
+run:
+  dataset: mnist        # mnist | fmnist | cifar10
+  device: auto          # auto | cpu | cuda | cuda:N
+  num_threads: 1        # CPU threads per process
+  runs_dir: null        # null -> env FEDRL_RUNS_DIR, else Drive if mounted, else ./runs
+  data_dir: ./data      # dataset cache (always local disk)
+
+# Federated learning protocol.
+fl:
+  N: 20                          # number of clients
+  k: 5                           # clients trained per round
+  T: 30                          # rounds per episode
+  blend_mode: after_aggregation  # after_aggregation | before_training
+  server_momentum: 0.0           # server momentum m (0 = plain averaging)
+  prox_mu: 0.0                   # FedProx coefficient (0 = off)
+  log_all_client_gain: true      # log personalization gain over ALL clients
+
+# Client population: data sizes, resources, battery model.
+clients:
+  size_mean: 600          # mean samples per client (lognormal)
+  size_sigma: 0.5         # lognormal sigma of client sizes
+  size_min: 150           # size clip (low)
+  size_max: 2000          # size clip (high)
+  val_frac: 0.25          # client validation size = round(val_frac * n_i)
+  val_min: 50             # minimum client validation size
+  resource_sigma: 0.5     # lognormal sigma for compute speed and bandwidth (median 1)
+  battery_init_low: 0.5   # initial battery ~ U(low, high)
+  battery_init_high: 1.0
+  min_battery: 0.05       # battery floor
+  recharge: 0.02          # recharge per round (cap 1.0)
+  drain_ref: 0.05         # drain_coef = drain_ref / (drain_ref_epochs * drain_ref_n)
+  drain_ref_epochs: 2
+  drain_ref_n: 600
+  n_transfers_base: 2     # download + upload
+
+# Dataset pools and splits.
+data:
+  pool_seed: 12345          # fixed seed for pools (identical for all scenarios and methods)
+  global_val_size: 5000     # balanced global validation set size
+  client_train_frac: 0.8    # remainder split: client-train pool fraction
+  personal_val_own_frac: 0.8  # personal-val: fraction from client's own distribution
+  personal_test_size: 200   # personal TEST set size (evaluation only)
+
+# Data drift timing (1-based rounds).
+drift:
+  abrupt_round: 15      # abrupt drift at the start of this round
+  gradual_start: 15     # gradual drift first round
+  gradual_rounds: 8     # number of transition rounds
+
+# Discrete action menus and default indices.
+menus:
+  lr: [0.001, 0.01, 0.05]
+  epochs: [1, 2, 5]
+  batch: [16, 32, 64]
+  alpha: [0.1, 0.3, 0.5, 0.7, 0.9]
+  default_lr_idx: 1
+  default_epochs_idx: 1
+  default_batch_idx: 1
+  default_alpha_idx: 2
+
+# State construction: memory mode and fixed scaling constants.
+state:
+  memory_mode: ema      # none | ema | ema_delta | gru_window | gru_const
+  ema_beta: 0.9
+  gru_window: 5         # window length for gru_window
+  extra_features: false # optional extra features
+  loss_scale: 3.0
+  div_scale: 2.0
+  log_clip: 3.0
+
+# Policy network.
+policy:
+  hidden: [64, 64]      # shared MLP encoder sizes
+  attention: true       # self-attention across clients
+  heads: 4              # attention heads
+  separate_bodies: false
+  gru_hidden: 64
+  active_heads: {select: true, train: true, mix: true}
+
+# Reward terms and weights (validation data only).
+reward:
+  mode: joint           # joint | stacked_shared | stacked_specialized
+  acc_scale: 10.0
+  w_global: 1.0
+  w_pers: 1.0
+  w_fair: 0.3
+  w_comm: 0.1
+  w_comp: 0.1
+  final_bonus: 1.0
+  cost_clip: 3.0
+  fair_percentile: 10
+
+# PPO hyperparameters and training schedule.
+ppo:
+  lr: 0.0003
+  gamma: 0.97
+  gae_lambda: 0.95
+  clip: 0.2
+  epochs: 4
+  minibatches: 4
+  entropy_coef: 0.01
+  value_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 400               # (placeholder) adjustable; does not change the config hash
+  update_every_episodes: 2    # (placeholder) adjustable
+  checkpoint_every: 10        # multiple of update_every_episodes
+  validate_every: 20          # multiple of update_every_episodes
+  reward_norm: false
+
+# Scenario sets (train / validation / test are disjoint).
+scenarios:
+  train: {a: [0.1, 0.3, 1.0], drift: [none, abrupt], n_seeds: 100}
+  val: {a: [0.15, 0.7], drift: [none, abrupt], seeds: [500, 501, 502]}
+  test: {a: [0.05, 0.2, 0.5], drift: [none, abrupt, gradual], seeds: [1000, 1001, 1002, 1003, 1004]}
+
+# Contextual bandit baseline (LinUCB).
+bandit:
+  ridge: 1.0
+  ucb_c: 1.0
+
+# Baseline tuning budget in FL rounds (null -> ppo.episodes * fl.T).
+tuning:
+  budget_rounds: null
+
+# Evaluation and statistics.
+eval:
+  bootstrap_resamples: 10000
+  ci: 0.95
+  target_acc: {mnist: 0.95, fmnist: 0.80, cifar10: 0.45}
+  log_curves: true
+
+# Logging.
+logging:
+  level: INFO

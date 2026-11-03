@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fedrl"
+version = "0.1.0"
+description = "Joint PPO control of client selection, training settings and model mixing in Non-IID federated learning"
+requires-python = ">=3.10"
+dependencies = [
+    "torch",
+    "torchvision",
+    "numpy",
+    "pyyaml",
+    "pandas",
+    "matplotlib",
+    "tqdm",
+    "pytest",
+    "scipy",
+]
+
+[tool.setuptools.packages.find]
+include = ["fedrl*"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"

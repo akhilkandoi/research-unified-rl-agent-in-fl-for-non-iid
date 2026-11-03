@@ -1,0 +1,16 @@
+# Smoke-test overrides (merged over default.yaml).
+fl: {N: 6, k: 2, T: 5}
+drift: {abrupt_round: 3, gradual_start: 3, gradual_rounds: 2}
+ppo:
+  episodes: 2
+  update_every_episodes: 1
+  checkpoint_every: 1
+  validate_every: 2
+  epochs: 1
+  minibatches: 1
+scenarios:
+  val: {seeds: [500]}
+  test: {seeds: [1000]}
+clients: {size_min: 40, size_max: 120, size_mean: 80}
+data: {global_val_size: 500}
+policy: {hidden: [16, 16]}
