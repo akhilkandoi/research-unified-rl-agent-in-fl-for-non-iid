@@ -12,6 +12,7 @@ import torch
 
 import fedrl.env.state as _state_module
 from fedrl.utils.logging_utils import get_logger
+from abc import ABC, abstractmethod
 
 LOGGER = get_logger(__name__)
 
@@ -33,7 +34,7 @@ PROBE_LOSS_IDX = feature_index(("probe_loss", "loss", "probe_loss_scaled"), 11)
 COMPUTE_SPEED_IDX = feature_index(("log_speed", "compute_speed", "log_compute_speed", "speed"), 16)
 
 
-class Controller:
+class Controller(ABC):
     """Base class for every method that outputs actions for the FL environment."""
 
     name: str = "controller"
@@ -45,9 +46,9 @@ class Controller:
     def reset(self, obs: dict) -> None:
         """Called once at the start of every episode."""
 
+    @abstractmethod
     def act(self, obs: dict, rng: np.random.Generator, deterministic: bool = True) -> dict:
         """Return an action dict for the current observation."""
-        raise NotImplementedError
 
     def observe(self, obs: dict, action: dict, reward: float, next_obs: dict | None,
                 info: dict) -> None:

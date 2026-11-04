@@ -359,8 +359,7 @@ def plot_e5(e5: pd.DataFrame, out_dir: Path, dataset: str) -> Path | None:
         return None
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     for ax, col in zip(axes, ("global_test_acc_per_comm", "global_test_acc_per_comp")):
-        vals = e5.assign(v=e5[col].str.split(" ").str[0].astype(float, errors="ignore")).copy()
-        vals["v"] = pd.to_numeric(vals["v"], errors="coerce")
+        vals = e5.assign(v=pd.to_numeric(e5[col].str.split(" ").str[0], errors="coerce")).copy()
         g = vals.groupby("method")["v"].mean()
         ax.bar(range(len(g)), g.values)
         ax.set_xticks(range(len(g)))
@@ -439,6 +438,6 @@ def run_analysis(root: str | Path, out_dir: str | Path, cfg: Any = None, ref: st
         pc = param_count_table(cfg)
         pc.to_csv(out / "param_counts.csv", index=False)
         (out / "param_counts.md").write_text(df_to_markdown(pc))
-    print("\n".join(statements))
-    print(f"[analysis] total comparisons across all metrics/datasets: {total_cmp}")
+    logger.info("\n".join(statements))
+    logger.info("total comparisons across all metrics/datasets: %d", total_cmp)
     return {"n_comparisons": total_cmp, "files": written, "out_dir": str(out)}

@@ -143,7 +143,7 @@ def compare_run_logs(dir_a: Path, dir_b: Path, rtol: float = 1e-4, atol: float =
         for col in da.columns:
             if _TIME_TOKENS & set(str(col).lower().split("_")):
                 continue
-            if np.issubdtype(da[col].dtype, np.number):
+            if pd.api.types.is_numeric_dtype(da[col]) and pd.api.types.is_numeric_dtype(db[col]):
                 if not np.allclose(da[col].to_numpy(float), db[col].to_numpy(float),
                                    rtol=rtol, atol=atol, equal_nan=True):
                     problems.append(f"{rel}: column {col} differs")

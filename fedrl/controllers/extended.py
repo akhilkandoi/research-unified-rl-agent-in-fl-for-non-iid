@@ -133,7 +133,7 @@ class AdaptiveMixing(Controller):
 
     def bind_env(self, env: Any, data: tuple | None = None) -> None:
         if str(self.cfg.fl.blend_mode) != "after_aggregation":
-            raise NotImplementedError("AdaptiveMixing supports blend_mode=after_aggregation only")
+            raise ValueError("AdaptiveMixing supports blend_mode=after_aggregation only")
         self._env = env
         self._model = copy.deepcopy(env.world.model)
         if data is None:

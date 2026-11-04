@@ -132,6 +132,6 @@ def compare_methods(df: pd.DataFrame, metric: str = "pers_test_acc", ref: str = 
     out.attrs["n_comparisons"] = len(out)
     logger.info("compare_methods(%s): %d comparisons", metric, len(out))
     if print_count:
-        print(f"[stats] metric={metric}: {len(out)} comparisons made (paired bootstrap, "
-              f"{n_resamples} resamples, {int(ci * 100)}% CI)")
+        logger.info("[stats] metric=%s: %d comparisons made (paired bootstrap, %d resamples, %d%% CI)",
+                    metric, len(out), n_resamples, int(ci * 100))
     return out

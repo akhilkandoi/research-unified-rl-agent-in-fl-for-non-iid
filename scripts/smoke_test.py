@@ -142,22 +142,11 @@ def stage_evaluate():
     CTX["results"] = results
     return f"{len(results)} evaluations written"
 
-
-def _metric(res):
-    for key, val in res.items():
-        if "global" in key.lower() and "acc" in key.lower() and isinstance(val, (int, float)):
-            return key
-    for key, val in res.items():
-        if isinstance(val, (int, float)) and not isinstance(val, bool):
-            return key
-    raise RuntimeError("no scalar metric in evaluation result")
-
-
 def stage_analysis():
     res = CTX["results"]
-    key = _metric(res[(RL_METHOD, EVAL_SEEDS[0])])
-    a = np.array([res[(RL_METHOD, s)][key] for s in EVAL_SEEDS], float)
-    b = np.array([res[("fedavg", s)][key] for s in EVAL_SEEDS], float)
+    key = "global_test_acc"
+    a = np.array([res[(RL_METHOD, s)]["metrics"][key] for s in EVAL_SEEDS], float)
+    b = np.array([res[("fedavg", s)]["metrics"][key] for s in EVAL_SEEDS], float)
     out = paired_bootstrap(a, b, n_resamples=200, ci=0.95, rng=np.random.default_rng(0))
     missing = [k for k in ("mean_diff", "lo", "hi", "excludes_zero") if k not in out]
     if missing:

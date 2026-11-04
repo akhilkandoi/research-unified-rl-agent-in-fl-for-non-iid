@@ -122,6 +122,12 @@ bandit:
   ridge: 1.0
   ucb_c: 1.0
 
+# Extended controller: AdaptiveMixing (alpha_i = sigmoid(theta_i)).
+adaptive_mixing:
+  lr: 1.0
+  theta_clip: 4.0
+
+
 # Baseline tuning budget in FL rounds (null -> ppo.episodes * fl.T).
 tuning:
   budget_rounds: null
