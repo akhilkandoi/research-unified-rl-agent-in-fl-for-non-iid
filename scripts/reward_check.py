@@ -100,13 +100,13 @@ def verdict(rows):
 
 
 def main():
+    global SEED
     ap = argparse.ArgumentParser(description="Reward sanity check (all flags optional)")
     ap.add_argument("--config", default=CONFIG)
     ap.add_argument("--dataset", default=DATASET)
     ap.add_argument("--seed", type=int, default=SEED)
     ap.add_argument("--set", dest="overrides", action="append", default=None)
     args = ap.parse_args()
-    global SEED
     SEED = args.seed
     overrides = list(args.overrides if args.overrides is not None else OVERRIDES)
     overrides.append(f"run.dataset={args.dataset}")
