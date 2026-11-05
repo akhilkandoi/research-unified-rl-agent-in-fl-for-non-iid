@@ -1,6 +1,6 @@
 # Pilot overrides (merged over default.yaml): selection + mixing heads only, N=10, k=3, T=20.
 fl: {N: 10, k: 3, T: 20}
 drift: {abrupt_round: 10, gradual_start: 10, gradual_rounds: 5}
-ppo: {episodes: 300}
+ppo: {episodes: 320}
 policy:
   active_heads: {train: false}
